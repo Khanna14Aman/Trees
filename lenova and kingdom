@@ -1,3 +1,4 @@
+question==>https://codeforces.com/problemset/problem/1337/C
 #include<iostream>
 #include<bits/stdc++.h>
 #define int long long 
