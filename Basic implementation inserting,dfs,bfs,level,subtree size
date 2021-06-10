@@ -2,6 +2,19 @@
 #include<bits/stdc++.h>
 #define int long long 
 using namespace std;
+void eulertour(int node, int par, vector<int> adj[])
+{
+	cout<<node<<" ";
+	for(auto it : adj[node])
+	{
+		if(it!=par)
+		{
+			eulertour(it,node,adj);
+			cout<<node<<" ";
+		}
+	}
+	return;
+}
 void subtreesize(int node, int par, vector<int> adj[], int subtree[])
 {
 	subtree[node] = 1;
@@ -91,5 +104,8 @@ signed main()
 	cout<<"\nsubtree size is    ";
 	for(i=1;i<=n;i++)
 		cout<<"\nsize of subtree "<<i<<"is "<<subtree[i]<<" ";
+	cout<<"\neuler tour is \n";
+	eulertour(1,-1,adj);
+
 	return 0;
 }
