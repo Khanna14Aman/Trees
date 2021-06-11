@@ -1,0 +1,96 @@
+#include<iostream>
+#include<bits/stdc++.h>
+using namespace std;
+int lca(int x, int y, int parent[][18], int level[])
+{
+    int dist = level[x]-level[y],i;
+    for(i=0;i<=log2(dist);i++)
+    {
+        if(dist&(1<<i))
+        {
+            x = parent[x][i];
+        }
+    }
+    if(x==y)
+    {
+        return y;
+    }
+    for(i=17;i>=0;i--)
+    {
+        if(parent[x][i]!=parent[y][i])
+        {
+            x = parent[x][i];
+            y = parent[y][i];
+        }
+    }
+    return parent[x][0];
+}
+void dfs(int node, int par, vector<int> adj[], int parent[][18], int level[], int lev)
+{
+    level[node]=lev;
+    parent[node][0]=par;
+    int i;
+    for(i=0;i<17;i++)
+    {
+        if(parent[node][i]>=0)
+        {
+            parent[node][i+1]=parent[parent[node][i]][i];
+        }
+    }
+    for(auto it : adj[node])
+    {
+        if(it!=par)
+        {
+            dfs(it,node,adj,parent,level,lev+1);
+        }
+    }
+    return;
+}
+int main()
+{
+    int n,i,m,k,x,y,u,v;
+    cin>>n>>m;
+    vector<int> adj[n+1];
+    for(i=0;i<n-1;i++)
+    {
+        cin>>u>>v;
+        adj[u].emplace_back(v);
+        adj[v].emplace_back(u);
+    }
+    int parent[n+1][18]={0},level[n+1]={0};
+    dfs(1,-1,adj,parent,level,1);
+    while(m--)  // since we need to select deepest node means node with greatest level for making path from root to that node so this will give answer
+    {
+        int deepest = 0,flag=0;
+        vector<int>vec;
+        cin>>k;
+        for(i=0;i<k;i++)
+        {
+            cin>>y;
+            vec.emplace_back(y);
+            if(level[y]>level[deepest])
+            {
+                deepest = y;
+            }
+        }
+        for(auto it : vec)
+        {
+            if(lca(deepest,it,parent,level)==it || level[it]-level[lca(deepest,it,parent,level)]==1)
+            {
+                continue;
+            }
+            //cout<<deepest<<" "<<lca(deepest,it,parent,level)<<"\n";
+            flag =1;
+            break;
+        }
+        if(flag == 1)
+        {
+            cout<<"NO\n";
+        }
+        else
+        {
+            cout<<"YES\n";
+        }
+    }
+    return 0;
+}
