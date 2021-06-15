@@ -1,0 +1,70 @@
+//question==>https://www.spoj.com/problems/ABCPATH/
+#include<iostream>
+#include<bits/stdc++.h>
+using namespace std;
+int maxi = 0;
+int dx[] = {-1,-1,0,1,1,1,0,-1};
+int dy[] = {0,1,1,1,0,-1,-1,-1};
+char ch[51][51];
+int t=0,dist[51][51]={0},r,c;
+void dfs(int i, int j, int d)
+{
+    int ind,newi,newj;
+    for(ind=0;ind<8;ind++)
+    {
+        newi = i+dx[ind];
+        newj = j+dy[ind];
+        if(newi>=0 && newi<r && newj>=0 && newj<c && ch[newi][newj]==ch[i][j]+1 && dist[newi][newj]<d)
+        {
+            dist[newi][newj]=d+1;
+            dfs(newi,newj,dist[newi][newj]);
+        }
+    }
+    return ;
+}
+int main()
+{
+    while(1)
+    {
+        cin>>r>>c;
+        if(r==0 || c==0)
+        {
+            break;
+        }
+        t++;
+        int i,j;
+        for(i=0;i<r;i++)
+        {
+            cin>>ch[i];
+            for(j=0;j<c;j++)
+            {
+                dist[i][j]=0;
+            }
+        }
+        for(i=0;i<r;i++)
+        {
+            for(j=0;j<c;j++)
+            {
+                if(ch[i][j]=='A' && dist[i][j]==0)
+                {
+                    dist[i][j]=1;
+                    dfs(i,j,1);
+                }
+            }
+        }
+        maxi = dist[0][0];
+        for(i=0;i<r;i++)
+        {
+            for(j=0;j<c;j++)
+            {
+                if(dist[i][j]>maxi)
+                {
+                    maxi = dist[i][j];
+                }
+            }
+        }
+        cout<<"Case "<<t<<": "<<maxi<<"\n";
+        
+    }
+    return 0;
+}
