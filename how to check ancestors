@@ -1,0 +1,45 @@
+#include<iostream>
+#include<bits/stdc++.h>
+using namespace std;
+string ancestor(int u,int v,int timein[],int timeout[])
+{
+    if(timein[u]<=timein[v] && timeout[v]<=timeout[u])
+    {
+        return "yes";
+    }
+    else
+    {
+        return "no";
+    }
+}
+void dfs(int node, int par, int &timer,vector<int>adj[],int timein[], int timeout[])
+{
+    timein[node]=++timer;
+    for(auto it:adj[node])
+    {
+        if(it!=par)
+        {
+            dfs(it,node,timer,adj,timein,timeout);
+        }
+    }
+    timeout[node]=++timer;
+    return;
+}
+int main()
+{
+    int n,i,u,v;
+    cin>>n;
+    int x,y;
+    vector<int>adj[n+1];
+    for(i=0;i<n-1;i++)
+    {
+        cin>>u>>v;
+        adj[u].emplace_back(v);
+        adj[v].emplace_back(u);
+    }
+    int timein[n+1]={0},timeout[n+1]={0},timer=0;
+    dfs(0,-1,timer,adj,timein,timeout);
+    cin>>x>>y;
+    cout<<ancestor(x,y,timein,timeout);
+    return 0;
+}
