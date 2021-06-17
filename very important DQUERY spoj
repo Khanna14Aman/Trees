@@ -1,0 +1,115 @@
+query==>https://www.spoj.com/problems/DISQUERY/
+explanation link==>https://youtu.be/Wv1b9oGCK18
+#include<iostream>
+#include<bits/stdc++.h>
+#define int long long 
+using namespace std;
+int a=0,b=0;
+vector<pair<int,int>> adj[100001];
+int n,timer=0,parent[100001][18],level[100001],minlength[100001][18],maxlength[100001][18],timein[200002],timeout[200002];
+bool ancestor(int x, int y)
+{
+    return (timein[x]<=timein[y] && timeout[y]<=timeout[x]);// this fumction will check for ancestor
+}
+int lca(int x, int y)
+{
+    if(level[x]<level[y])
+    {
+        swap(x,y);
+    }
+    int dist = level[x]-level[y],i;
+    for(i=0;i<=log2(dist);i++)
+    {
+        if(dist&(1<<i))
+        {
+            x = parent[x][i];
+        }
+    }
+    if(x==y)
+    {
+        return x;
+    }
+    for(i=17;i>=0;i--)
+    {
+        if(parent[x][i]!=parent[y][i])
+        {
+            x=parent[x][i];
+            y=parent[y][i];
+        }
+    }
+    return parent[x][0];
+}
+pair<int,int> query(int x, int y)
+{
+    int l = lca(x,y);
+   // cout<<l<<" ";
+    int shortest=1e17,longest=0,j;
+    for(j=17;j>=0;j--)
+    {
+        if(ancestor(l,parent[x][j]))
+        {
+         //   cout<<b++<<"\n";
+            shortest = min(shortest,minlength[x][j]);
+            longest = max(longest,maxlength[x][j]);
+            x = parent[x][j];
+        }
+    }
+    for(j=17;j>=0;j--)
+    {
+        if(ancestor(l,parent[y][j]))
+        {
+           // cout<<a++<<"\n";
+            shortest = min(shortest,minlength[y][j]);
+            longest = max(longest,maxlength[y][j]);
+            y = parent[y][j];
+        }
+    }
+    return make_pair(shortest,longest);
+}
+void dfs(int node, int par, int lev, int mini, int maxi)
+{
+    level[node]=lev;
+    parent[node][0]=par;
+    minlength[node][0]=mini;
+    maxlength[node][0]=maxi;
+    timein[node]=timer++;
+    int i;
+    for(i=0;i<17;i++)
+    {
+            parent[node][i+1]=parent[parent[node][i]][i];//this line will store all 17 parent of every node
+            minlength[node][i+1]=min(minlength[node][i],minlength[parent[node][i]][i]);//this will store minlength between i ka 2^j-1thparent and  2^j-1th parent ka 2^j-1thparent
+            maxlength[node][i+1]=max(maxlength[node][i],maxlength[parent[node][i]][i]);
+        
+    }
+    for(auto it : adj[node])
+    {
+        if(it.first!=par)
+        {
+            dfs(it.first,node,lev+1,it.second,it.second);
+        }
+    }
+    timeout[node]=timer++;
+    return;
+}
+signed main()
+{
+    int i,u,v,x,y,d;
+    cin>>n;
+    for(i=0;i<n-1;i++)
+    {
+        cin>>u>>v>>d;
+        adj[u].push_back({v,d});
+        adj[v].push_back({u,d});
+    }
+    dfs(1,1,1,1e17,0);//this line is very important as here we need to initialize parent of root node is 1
+    int q;
+    cin>>q;
+    while(q--)
+    {
+        cin>>x>>y;
+        auto ans = query(x,y);
+        cout<<ans.first<<" "<<ans.second<<"\n";
+        
+    }
+    return 0;
+}
