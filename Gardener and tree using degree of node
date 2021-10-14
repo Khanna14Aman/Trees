@@ -1,0 +1,58 @@
+question==>https://codeforces.com/contest/1593/problem/E
+
+#include<bits/stdc++.h>
+#define int long long 
+#define sz(x) ((int)x.size())
+using namespace std;
+signed main(){
+    int t;
+    cin>>t;
+    while(t--){
+        int n,k;
+        int a,b;
+        cin>>n>>k;
+        set<int>*edges = new set<int>[n+1];
+        
+        // connecting all the vertices to each other and making a tree  and size of each edged[i]have a degree of that ith vertices
+        // if 1st node is connected to 2nd and 3rd then degree of 1st node is 2nd
+        for(int i=1;i<n;i++){
+            cin>>a>>b;
+            edges[a].insert(b);   
+            edges[b].insert(a); 
+        }
+        
+        // storing degree of all the vertices and that vertex in set of pair in ascending order of there degree
+        
+        set<pair<int,int>>sorted;
+        for(int i=1;i<=n;i++){
+            sorted.insert({sz(edges[i]),i});
+        }
+        
+        
+        // applying k opereations || if size of sorted becomes zero then exit the loop because there is no vertex left to continue
+        while(k>0 && sz(sorted)){
+            set<int>toremove;
+            // removing all the vertices having degree less than equal 1 because these are leaf vertices
+             while(sz(sorted) && (*sorted.begin()).first<=1){
+                toremove.insert((*sorted.begin()).second);// store all the vertices in remove set and delete from sorted
+                sorted.erase(sorted.begin());
+            }
+            // iterating all the connected vertices of deleted vertex/leaf vertex and reduce the size of all the connected vertex by no of leaf vertex connected to that
+            for(auto i:toremove){
+                for(auto j:edges[i]){
+                    if(sorted.find({sz(edges[j]),j})!=sorted.end()){
+                        sorted.erase({sz(edges[j]),j});
+                        edges[j].erase(i);
+                        if(toremove.count(j)==0){
+                            sorted.insert({sz(edges[j]),j});
+                        }
+                    }
+                }
+                edges[i].clear();
+            }
+            k--;
+        }
+        cout<<sz(sorted)<<"\n";
+    }
+    return 0;
+}
